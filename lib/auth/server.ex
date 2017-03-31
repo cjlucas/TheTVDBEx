@@ -1,7 +1,11 @@
 defmodule TheTVDB.Auth.Server do
   use GenServer
+  
+  @moduledoc false
 
   defmodule State do
+    @moduledoc false
+
     defstruct [:token, :expires_in]
   end
 
@@ -16,12 +20,16 @@ defmodule TheTVDB.Auth.Server do
   def init({:global, api_key}) do
   end
 
-  def init({:user, api_key, username, user_key})
+  def init({:user, api_key, username, user_key}) do
+  end
 
 
-  def token(:global)
+  def token(:global) do
+    
+  end
 
-  def token({:user, username})
+  def token({:user, username}) do
+  end
 
   def handle_call(:token, _from, state) do
     %{token: token} = state

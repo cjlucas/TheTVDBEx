@@ -1,4 +1,6 @@
 defmodule TheTVDB.Model do
+  @moduledoc false
+
   defmacro __using__(_opts) do
     quote do
       import TheTVDB.Model
@@ -12,6 +14,7 @@ defmodule TheTVDB.Model do
 
       defstruct (Module.get_attribute(__MODULE__, :model_fields) |> Enum.map(&elem(&1, 0)))
 
+      @doc false
       def from_json(data) when is_map(data) do
         @model_fields
         |> Enum.reduce(%__MODULE__{}, fn {name, api_name}, acc ->
