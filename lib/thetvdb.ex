@@ -17,9 +17,18 @@ defmodule TheTVDB do
     import Supervisor.Spec, warn: false
 
     children = [
-      supervisor(Registry, [:unique, Registry])
+      supervisor(Registry, [:unique, Registry]),
+      supervisor(TheTVDB.Auth.Supervisor, [])
     ]
 
+    {:ok, _} = TheTVDB.APIv2.start
+
     Supervisor.start_link(children, strategy: :one_for_one)
+  end
+
+  @spec authenticate(binary) :: :ok | {:error, String.t}
+  def authenticate(api_key) do
+    {:ok, _} = TheTVDB.Auth.Supervisor.start_child(api_key)
+    :ok
   end
 end

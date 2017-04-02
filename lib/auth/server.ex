@@ -18,17 +18,24 @@ defmodule TheTVDB.Auth.Server do
   end
 
   def init({:global, api_key}) do
+    case TheTVDB.Auth.login(api_key) do
+      {:ok, token} ->
+        {:ok, %State{token: token}}
+      {:error, reason} ->
+        {:stop, reason}
+    end
   end
 
-  def init({:user, api_key, username, user_key}) do
-  end
+  #def init({:user, api_key, username, user_key}) do
+  #end
 
 
   def token(:global) do
-    
+    via(:global) |> GenServer.call(:token)
   end
 
   def token({:user, username}) do
+    via({:user, username}) |> GenServer.call(:token)
   end
 
   def handle_call(:token, _from, state) do
