@@ -13,6 +13,8 @@ defmodule TheTVDB.Model do
       unquote(block)
 
       defstruct (Module.get_attribute(__MODULE__, :model_fields) |> Enum.map(&elem(&1, 0)))
+      
+      @type t :: %__MODULE__{}
 
       @doc false
       def from_json(data) when is_map(data) do

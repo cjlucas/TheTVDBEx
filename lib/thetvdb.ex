@@ -21,8 +21,6 @@ defmodule TheTVDB do
       supervisor(TheTVDB.Auth.Supervisor, [])
     ]
 
-    {:ok, _} = TheTVDB.APIv2.start
-
     Supervisor.start_link(children, strategy: :one_for_one)
   end
 

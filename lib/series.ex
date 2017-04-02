@@ -1,76 +1,3 @@
-
-defmodule Test do
-  use TheTVDB.Model
-
-  @moduledoc """
-  This struct does stuff
-  """
-
-  model do
-    field "hi"
-    field "There"
-  end
-end
-
-defmodule Test2 do
-  use TheTVDB.Model
-
-  @moduledoc """
-  This struct does stuff
-  """
-
-  model do
-    field "hi"
-    field "There"
-  end
-end
-
-defmodule Thing do
-
-  @doc """
-  Documenting the struct
-  """
-  defstruct [:field1, :field2]
-end
-
-defmodule TheTVDB.Episode do
-  use TheTVDB.Model
-
-  model do
-    field "absoluteNumber"
-    field "airedEpisodeNumber"
-    field "airedSeason"
-    field "airsAfterSeason"
-    field "airsBeforeEpisode"
-    field "airsBeforeSeason"
-    field "director"
-    field "directors"
-    field "dvdChapter"
-    field "dvdDiscid"
-    field "dvdEpisodeNumber"
-    field "dvdSeason"
-    field "episodeName"
-    field "filename"
-    field "firstAired"
-    field "guestStars"
-    field "id"
-    field "imdbId"
-    field "lastUpdated"
-    field "lastUpdatedBy"
-    field "overview"
-    field "productionCode"
-    field "seriesId"
-    field "showUrl"
-    field "siteRating"
-    field "siteRatingCount"
-    field "thumbAdded"
-    field "thumbAuthor"
-    field "thumbHeight"
-    field "thumbWidth"
-    field "writers"
-  end
-end
-
 defmodule TheTVDB.Series do
   use TheTVDB.Model
 
@@ -111,15 +38,6 @@ defmodule TheTVDB.Series do
      field "seriesId"
      field "sortOrder"
     end
-
-    def get(series_id) do
-      case TheTVDB.API.get("/series/#{series_id}/actors") do
-        {:ok, %{"data" => data}} ->
-          data |> Enum.map(&from_json(&1))
-        {:error, reason} ->
-          {:error, reason}
-      end
-    end
   end
 
   defmodule BasicEpisode do
@@ -139,7 +57,31 @@ defmodule TheTVDB.Series do
     end
   end
 
-  def get(id) do
+  defmodule SeriesSearch do
+    use TheTVDB.Model
+
+    model do
+      field "aliases"
+      field "banner"
+      field "firstAired"
+      field "id"
+      field "network"
+      field "overview"
+      field "seriesName"
+      field "status"
+    end
+  end
+
+  def exists?(id) do
+    case TheTVDB.API.head("/series/#{id}") do
+      {:ok, code} ->
+        code == 200
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  def info(id) do
     case TheTVDB.API.get("/series/#{id}") do
       {:ok, %{"data" => data}} ->
         from_json(data)
@@ -148,8 +90,40 @@ defmodule TheTVDB.Series do
     end
   end
 
+  def actors(series_id) do
+    case TheTVDB.API.get("/series/#{series_id}/actors") do
+      {:ok, %{"data" => data}} ->
+        data |> Enum.map(&from_json(&1))
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
   def episodes(series_id) do
     TheTVDB.API.get_stream("/series/#{series_id}/episodes")
     |> Stream.map(&BasicEpisode.from_json/1)
+  end
+
+  def search_by_name(name) do
+    search_by("name", name)
+  end
+
+  def search_by_imdb_id(id) do
+    search_by("imdbId", id)
+  end
+
+  def search_by_zap2it_id(id) do
+    search_by("zap2itId", id)
+  end
+
+  defp search_by(param, query) do
+    endpoint = "/search/series?#{URI.encode_query(%{param => query})}"
+    IO.puts endpoint
+    case TheTVDB.API.get(endpoint) do
+      {:ok, %{"data" => data}} ->
+        data |> Enum.map(&SeriesSearch.from_json(&1))
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 end

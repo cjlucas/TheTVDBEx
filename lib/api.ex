@@ -3,25 +3,28 @@ defmodule TheTVDB.API do
   @base_url Application.get_env(:thetvdb, :api_url)
 
   def get(endpoint, opts \\ []) do
-    opts = Keyword.put_new(opts, :requires_auth, true)
-    headers = headers(opts)
+    case request(:get, url(endpoint), opts) do
+      {:ok, _, body} ->
+        {:ok, body}
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
 
-    case url(endpoint) |> HTTPoison.get(headers) do
-      {:ok, %{body: body}} ->
-        Poison.decode(body)
+  def head(endpoint, opts \\[]) do
+    case request(:head, url(endpoint), opts) do
+      {:ok, status_code, _} ->
+        {:ok, status_code}
       {:error, reason} ->
         {:error, reason}
     end
   end
 
   def get_stream(endpoint, opts \\ []) do
-    opts = Keyword.put_new(opts, :requires_auth, true)
-
     start = fn ->
-      IO.puts(url(endpoint))
-      case HTTPoison.get(url(endpoint), headers(opts)) do
-        {:ok, %{body: body}} ->
-          %{"data" => data, "links" => links} = Poison.decode!(body)
+      case request(:get, url(endpoint), opts) do
+        {:ok, _, body} ->
+          %{"data" => data, "links" => links} = body
           %{"next" => next} = links
           {data, next}
         {:error, reason} ->
@@ -48,9 +51,9 @@ defmodule TheTVDB.API do
           |> URI.to_string
 
         IO.puts(url)
-        case HTTPoison.get(url, headers(opts)) do
-          {:ok, %{body: body}} ->
-            %{"data" => next_data, "links" => links} = Poison.decode!(body)
+        case request(:get, url, opts) do
+          {:ok, _, body} ->
+            %{"data" => next_data, "links" => links} = body
             %{"next" => next} = links
             {data, {next_data, next}}
           {:error, reason} ->
@@ -63,12 +66,9 @@ defmodule TheTVDB.API do
   end
 
   def post(endpoint, body, opts \\ []) do
-    opts = Keyword.put_new(opts, :requires_auth, true)
-    headers = headers(opts)
-
-    case url(endpoint) |> HTTPoison.post(Poison.encode!(body), headers) do
-      {:ok, %{body: body}} ->
-        Poison.decode(body)
+    case request(:post, url(endpoint), body, opts) do
+      {:ok, _, body} ->
+        {:ok, body}
       {:error, reason} ->
         {:error, reason}
     end
@@ -81,6 +81,22 @@ defmodule TheTVDB.API do
       Keyword.put(headers, :authorization, "Bearer #{token()}")
     else
       headers
+    end
+  end
+
+  def request(method, url, body \\ "", opts) do
+    opts = Keyword.put_new(opts, :requires_auth, true)
+    headers = headers(opts)
+
+    body = if is_binary(body), do: body, else: Poison.encode!(body)
+
+    case HTTPoison.request(method, url, body, headers) do
+      {:ok, %{status_code: code, body: body}} when byte_size(body) > 0 ->
+        {:ok, code, Poison.decode!(body)}
+      {:ok, %{status_code: code}} ->
+        {:ok, code, nil}
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
