@@ -34,7 +34,8 @@ defmodule TheTVDB.Episode do
     field "thumbWidth"
     field "writers"
   end
-  
+
+  @spec info(TheTVDB.Series.BasicEpisode.t | integer) :: t
   def info(%TheTVDB.Series.BasicEpisode{id: id}), do: info(id)
   def info(id) do
     case TheTVDB.API.get("/episodes/#{id}") do

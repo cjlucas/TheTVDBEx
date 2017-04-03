@@ -1,18 +1,7 @@
 defmodule TheTVDB do
   use Application
-  @moduledoc """
-  Documentation for Thetvdb.
-  """
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Thetvdb.hello
-      :world
-
-  """
+  @doc false
   def start(_, _) do
     import Supervisor.Spec, warn: false
 

@@ -24,7 +24,7 @@ defmodule TheTVDB.Series do
     field "zap2itId"
   end
 
-  defmodule Actors do
+  defmodule Actor do
     use TheTVDB.Model
 
     model do
@@ -72,6 +72,7 @@ defmodule TheTVDB.Series do
     end
   end
 
+  @spec exists?(integer) :: boolean
   def exists?(id) do
     case TheTVDB.API.head("/series/#{id}") do
       {:ok, code} ->
@@ -81,6 +82,7 @@ defmodule TheTVDB.Series do
     end
   end
 
+  @spec info(integer) :: t
   def info(id) do
     case TheTVDB.API.get("/series/#{id}") do
       {:ok, %{"data" => data}} ->
@@ -90,28 +92,33 @@ defmodule TheTVDB.Series do
     end
   end
 
+  @spec actors(integer) :: [Actor.t]
   def actors(series_id) do
     case TheTVDB.API.get("/series/#{series_id}/actors") do
       {:ok, %{"data" => data}} ->
-        data |> Enum.map(&from_json(&1))
+        data |> Enum.map(&Actor.from_json(&1))
       {:error, reason} ->
         {:error, reason}
     end
   end
 
+  @spec episodes(integer) :: [BasicEpisode.t]
   def episodes(series_id) do
     TheTVDB.API.get_stream("/series/#{series_id}/episodes")
     |> Stream.map(&BasicEpisode.from_json/1)
   end
 
+  @spec search_by_name(String.t) :: [t]
   def search_by_name(name) do
     search_by("name", name)
   end
 
+  @spec search_by_imdb_id(binary | integer) :: [t]
   def search_by_imdb_id(id) do
     search_by("imdbId", id)
   end
 
+  @spec search_by_zap2it_id(binary | integer) :: [t]
   def search_by_zap2it_id(id) do
     search_by("zap2itId", id)
   end
