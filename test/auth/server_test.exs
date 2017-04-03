@@ -14,7 +14,7 @@ defmodule TheTVDB.Auth.ServerTest do
       Plug.Conn.resp(conn, 200, Poison.encode!(%{"token" => "bar"}))
     end
 
-    {:ok, _} = TheTVDB.Auth.Server.start_link("bar")
-    assert TheTVDB.Auth.Server.token(:global) == "bar"
+    {:ok, pid} = TheTVDB.Auth.Server.start_link("bar")
+    assert TheTVDB.Auth.Server.token(pid) == "bar"
   end
 end

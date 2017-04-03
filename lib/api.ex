@@ -65,10 +65,28 @@ defmodule TheTVDB.API do
     Stream.resource(start, next, fn _ -> nil end)
   end
 
+  def put(endpoint, body \\ "", opts \\ []) do
+    case request(:put, url(endpoint), body, opts) do
+      {:ok, _, body} ->
+        {:ok, body}
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
   def post(endpoint, body, opts \\ []) do
     case request(:post, url(endpoint), body, opts) do
       {:ok, _, body} ->
         {:ok, body}
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+  
+  def delete(endpoint, opts \\ []) do
+    case request(:delete, url(endpoint), opts) do
+      {:ok, _, _} ->
+        :ok
       {:error, reason} ->
         {:error, reason}
     end
@@ -78,7 +96,13 @@ defmodule TheTVDB.API do
     headers = [{"Content-Type", "application/json"}]
 
     if opts[:requires_auth] do
-      Keyword.put(headers, :authorization, "Bearer #{token()}")
+      case TheTVDB.Auth.Registry.lookup(opts[:scope]) do
+        pid when is_pid(pid) ->
+          token = TheTVDB.Auth.Server.token(pid)
+          Keyword.put(headers, :authorization, "Bearer #{token}")
+        nil ->
+          throw :no_server_found
+      end
     else
       headers
     end
@@ -86,6 +110,8 @@ defmodule TheTVDB.API do
 
   def request(method, url, body \\ "", opts) do
     opts = Keyword.put_new(opts, :requires_auth, true)
+    opts = Keyword.put_new(opts, :scope, :global)
+
     headers = headers(opts)
 
     body = if is_binary(body), do: body, else: Poison.encode!(body)
@@ -102,9 +128,5 @@ defmodule TheTVDB.API do
 
   defp url(endpoint) do
     @base_url <> endpoint
-  end
-
-  defp token do
-    TheTVDB.Auth.Server.token(:global)
   end
 end

@@ -3,47 +3,80 @@ defmodule TheTVDB.Auth.Server do
   
   @moduledoc false
 
+  @refresh_interval 60 * 60 * 1000
+
   defmodule State do
     @moduledoc false
 
-    defstruct [:token, :expires_in]
+    defstruct [:token, :expires_at]
   end
 
   def start_link(api_key) do
-    GenServer.start_link(__MODULE__, {:global, api_key}, name: via(:global))
+    GenServer.start_link(__MODULE__, {:global, api_key})
   end
   
   def start_link(api_key, username, user_key) do
-    GenServer.start_link(__MODULE__, {:user, api_key, username, user_key}, name: via({:user, username}))
+    GenServer.start_link(__MODULE__, {:user, api_key, username, user_key})
   end
 
   def init({:global, api_key}) do
+    TheTVDB.Auth.Registry.register(:global)
+
     case TheTVDB.Auth.login(api_key) do
       {:ok, token} ->
-        {:ok, %State{token: token}}
+        expires_at = now() + @refresh_interval
+        {:ok, %State{token: token, expires_at: expires_at}, @refresh_interval}
       {:error, reason} ->
         {:stop, reason}
     end
   end
 
-  #def init({:user, api_key, username, user_key}) do
-  #end
-
-
-  def token(:global) do
-    via(:global) |> GenServer.call(:token)
+  def init({:user, api_key, username, user_key}) do
+    TheTVDB.Auth.Registry.register(:user)
+    TheTVDB.Auth.Registry.register({:user, username})
+    
+    case TheTVDB.Auth.login(api_key, username, user_key) do
+      {:ok, token} ->
+        expires_at = now() + @refresh_interval
+        {:ok, %State{token: token, expires_at: expires_at}, @refresh_interval}
+      {:error, reason} ->
+        {:stop, reason}
+    end
   end
 
-  def token({:user, username}) do
-    via({:user, username}) |> GenServer.call(:token)
+  @spec refresh(pid) :: :ok
+  def refresh(pid) do
+    GenServer.call(pid, :refresh)
+  end
+
+  @spec refresh(pid) :: String.t
+  def token(pid) do
+    GenServer.call(pid, :token)
+  end
+
+  def handle_call(:refresh, _from, state) do
+    %{token: token} = state
+
+    {:ok, token} = TheTVDB.Auth.refresh_token(token)
+    expires_at = now() + @refresh_interval
+    {:reply, :ok, %{state | token: token, expires_at: expires_at}, @refresh_interval}
   end
 
   def handle_call(:token, _from, state) do
-    %{token: token} = state
-    {:reply, token, state} 
+    %{token: token, expires_at: expires_at} = state
+    {:reply, token, state, timeout(expires_at)} 
   end
 
-  defp via(key) do
-    {:via, Registry, {Registry, key}}
+  def handle_info(:timeout, state) do
+    {:reply, :ok, state, timeout} = handle_call(:refresh, nil, state)
+    {:noreply, state, timeout}
+  end
+
+  defp timeout(expires_at) do
+    expires_at - now()
+  end
+
+  defp now do
+    System.monotonic_time(:millisecond)
   end
 end

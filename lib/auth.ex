@@ -18,6 +18,12 @@ defmodule TheTVDB.Auth do
     end
   end
 
-  #def refresh(token) do
-  #end
+  def refresh_token(token) do
+    case TheTVDB.API.get("/refresh_token", token: token) do
+      {:ok, %{"token" => token}} ->
+        {:ok, token}
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
 end
