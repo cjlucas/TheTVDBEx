@@ -1,5 +1,7 @@
 defmodule TheTVDB.API do
 
+  @moduledoc false
+
   @base_url Application.get_env(:thetvdb, :api_url)
 
   def get(endpoint, opts \\ []) do
