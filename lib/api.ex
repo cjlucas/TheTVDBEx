@@ -98,22 +98,32 @@ defmodule TheTVDB.API do
     headers = [{"Content-Type", "application/json"}]
 
     if opts[:requires_auth] do
-      case TheTVDB.Auth.Registry.lookup(opts[:scope]) do
-        pid when is_pid(pid) ->
-          token = TheTVDB.Auth.Server.token(pid)
-          Keyword.put(headers, :authorization, "Bearer #{token}")
-        nil ->
-          throw :no_server_found
-      end
+      Keyword.put(headers, :authorization, "Bearer #{opts[:token]}")
     else
       headers
     end
   end
 
-  def request(method, url, body \\ "", opts) do
+  defp opts(opts) do
     opts = Keyword.put_new(opts, :requires_auth, true)
     opts = Keyword.put_new(opts, :scope, :global)
 
+    if opts[:requires_auth] do
+      Keyword.put_new_lazy(opts, :token, fn ->
+        case TheTVDB.Auth.Registry.lookup(opts[:scope]) do
+          pid when is_pid(pid) ->
+            TheTVDB.Auth.Server.token(pid)
+          nil ->
+            throw :no_server_found
+        end
+      end)
+    else
+      opts
+    end
+  end
+
+  def request(method, url, body \\ "", opts) do
+    opts = opts(opts)
     headers = headers(opts)
 
     body = if is_binary(body), do: body, else: Poison.encode!(body)
