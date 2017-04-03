@@ -3,10 +3,12 @@ defmodule TheTVDB.Mixfile do
 
   def project do
     [app: :thetvdb,
-     version: "0.1.0",
+     version: "1.0.0-alpha",
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     description: description(),
+     package: package(),
      deps: deps(),
      consolidate_protocols: Mix.env != :test
    ]
@@ -18,6 +20,21 @@ defmodule TheTVDB.Mixfile do
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
     [applications: [:logger, :httpoison], mod: {TheTVDB, []}]
+  end
+
+  def description do
+    """
+    An Elixir library for TheTVDB API
+    """
+  end
+
+  def package do
+    [
+      name: :thetvdb,
+      licenses: ["MIT"],
+      maintainers: ["Chris Lucas <chris@chrisjlucas.com>"],
+      links: %{"GitHub" => "https://github.com/cjlucas/TheTVDBEx"}
+    ]
   end
 
   # Dependencies can be Hex packages:
