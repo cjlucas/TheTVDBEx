@@ -2,7 +2,7 @@ defmodule TheTVDB.API do
 
   @moduledoc false
 
-  @base_url Application.get_env(:thetvdb, :api_url)
+  @base_url Application.get_env(:thetvdb, :api_url, "https://api.thetvdb.com")
 
   def get(endpoint, opts \\ []) do
     case request(:get, url(endpoint), opts) do
