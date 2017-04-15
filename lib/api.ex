@@ -30,8 +30,7 @@ defmodule TheTVDB.API do
           %{"next" => next} = links
           {data, next}
         {:error, reason} ->
-          IO.puts("STREAM FAILED #{reason}")
-          {[], nil}
+          raise reason
       end
     end
 
@@ -52,15 +51,13 @@ defmodule TheTVDB.API do
           |> Map.put(:query, query)
           |> URI.to_string
 
-        IO.puts(url)
         case request(:get, url, opts) do
           {:ok, _, body} ->
             %{"data" => next_data, "links" => links} = body
             %{"next" => next} = links
             {data, {next_data, next}}
           {:error, reason} ->
-            IO.puts("STREAM FAILED #{reason}")
-            {data, nil}
+            raise reason
         end
     end
 
@@ -114,7 +111,7 @@ defmodule TheTVDB.API do
           pid when is_pid(pid) ->
             TheTVDB.Auth.Server.token(pid)
           nil ->
-            throw :no_server_found
+            raise TheTVDB.NotAuthenticatedError, "No token found"
         end
       end)
     else
@@ -129,6 +126,11 @@ defmodule TheTVDB.API do
     body = if is_binary(body), do: body, else: Poison.encode!(body)
 
     case HTTPoison.request(method, url, body, headers) do
+      {:ok, %{status_code: 401}} ->
+        {:error, %TheTVDB.NotAuthenticatedError{message: "Not authenticated"}}
+      {:ok, %{status_code: 404, body: body}} ->
+        msg = Poison.decode!(body) |> Map.get("Error")
+        {:error, %TheTVDB.NotFoundError{message: msg}}
       {:ok, %{status_code: code, body: body}} when byte_size(body) > 0 ->
         {:ok, code, Poison.decode!(body)}
       {:ok, %{status_code: code}} ->

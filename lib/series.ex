@@ -79,7 +79,7 @@ defmodule TheTVDB.Series do
       {:ok, code} ->
         code == 200
       {:error, reason} ->
-        {:error, reason}
+        raise reason
     end
   end
 
@@ -92,7 +92,7 @@ defmodule TheTVDB.Series do
       {:ok, %{"data" => data}} ->
         from_json(data)
       {:error, reason} ->
-        {:error, reason}
+        raise reason
     end
   end
 
@@ -102,10 +102,15 @@ defmodule TheTVDB.Series do
   @spec actors(integer) :: [Actor.t]
   def actors(series_id) do
     case TheTVDB.API.get("/series/#{series_id}/actors") do
+      # API WORKAROUND: This endpoint returns {data: nil} if an
+      # invalid series_id is given, so just throw NotFoundError as if
+      # the endpoint return a 404 (as it should)
+      {:ok, %{"data" => data}} when is_nil(data)->
+        raise TheTVDB.NotFoundError, "ID #{series_id} not found"
       {:ok, %{"data" => data}} ->
         data |> Enum.map(&Actor.from_json(&1))
       {:error, reason} ->
-        {:error, reason}
+        raise reason
     end
   end
 
@@ -156,8 +161,12 @@ defmodule TheTVDB.Series do
     case TheTVDB.API.get(endpoint) do
       {:ok, %{"data" => data}} ->
         data |> Enum.map(&SeriesSearch.from_json(&1))
+      # API WORKAROUND: A 404 is returned if no results are found.
+      # But it's more natural to return an empty list indicating no results.
+      {:error, %TheTVDB.NotFoundError{}} ->
+        []
       {:error, reason} ->
-        {:error, reason}
+        raise reason
     end
   end
 end

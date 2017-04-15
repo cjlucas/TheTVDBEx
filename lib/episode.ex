@@ -45,7 +45,7 @@ defmodule TheTVDB.Episode do
       {:ok, %{"data" => data}} ->
         from_json(data)
       {:error, reason} ->
-        {:error, reason}
+        raise reason
     end
   end
 end

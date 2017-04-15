@@ -34,6 +34,12 @@ defmodule TheTVDB do
       
       # Fetch user authentication for jamesDean
       TheTVDB.User.info("jamesDean")
+
+
+  ## Error Handling
+  
+  With the exception of `TheTVDB.authenticate/1` and `TheTVDB.authenticate/3`,
+  all functions will raise an error.
   """
 
   @doc false
@@ -57,7 +63,7 @@ defmodule TheTVDB do
   Authenticate with TheTVDB API. This will provide access to globally
   scoped endpoints.
   """
-  @spec authenticate(binary) :: :ok | {:error, String.t}
+  @spec authenticate(binary) :: :ok | {:error, TheTVDB.NotAuthenticatedError.t}
   def authenticate(api_key) do
     TheTVDB.Auth.Supervisor.start_child(api_key)
     |> handle_sup_response
@@ -70,7 +76,7 @@ defmodule TheTVDB do
   Note: `user_key` corresponds to the "Account Identifier" under the
   user account page.
   """
-  @spec authenticate(binary, String.t, binary) :: :ok | {:error, String.t}
+  @spec authenticate(binary, String.t, binary) :: :ok | {:error, TheTVDB.NotAuthenticatedError.t}
   def authenticate(api_key, username, user_key) do
     TheTVDB.Auth.Supervisor.start_child(api_key, username, user_key)
     |> handle_sup_response

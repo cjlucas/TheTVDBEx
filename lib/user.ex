@@ -39,6 +39,8 @@ defmodule TheTVDB.User do
     case TheTVDB.API.get("/user", scope: scope(username)) do
       {:ok, %{"data" => data}} ->
         from_json(data)
+      {:error, reason} ->
+          raise reason
     end
   end
 
@@ -50,6 +52,8 @@ defmodule TheTVDB.User do
     case TheTVDB.API.get("/user/favorites", scope: scope(username)) do
       {:ok, %{"data" => data}} ->
         data["favorites"]
+      {:error, reason} ->
+          raise reason
     end
   end
 
@@ -62,6 +66,8 @@ defmodule TheTVDB.User do
     case TheTVDB.API.put(endpoint, "", scope: scope(username)) do
       {:ok, _} ->
         :ok
+      {:error, reason} ->
+        raise reason
     end
   end
 
@@ -106,6 +112,8 @@ defmodule TheTVDB.User do
     case TheTVDB.API.put(endpoint, "", scope: scope(username)) do
       {:ok, _} ->
         :ok
+      {:error, reason} ->
+        raise reason
     end
   end
 
@@ -116,7 +124,10 @@ defmodule TheTVDB.User do
   def remove_rating(username \\ nil, type, item) when type in @rating_types do
     type = Atom.to_string(type)
     endpoint = "/user/ratings/#{type}/#{item}"
-    TheTVDB.API.delete(endpoint, scope: scope(username))
+    case TheTVDB.API.delete(endpoint, scope: scope(username)) do
+      :ok              -> :ok
+      {:error, reason} -> raise reason
+    end
   end
 
   defp scope(username) when is_nil(username), do: :user
