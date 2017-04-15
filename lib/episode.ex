@@ -16,11 +16,11 @@ defmodule TheTVDB.Episode do
     field "dvdSeason"
     field "episodeName"
     field "filename"
-    field "firstAired"
+    field "firstAired", type: :date
     field "guestStars"
     field "id"
     field "imdbId"
-    field "lastUpdated"
+    field "lastUpdated", type: :unix_timestamp
     field "lastUpdatedBy"
     field "overview"
     field "productionCode"
@@ -30,8 +30,8 @@ defmodule TheTVDB.Episode do
     field "siteRatingCount"
     field "thumbAdded"
     field "thumbAuthor"
-    field "thumbHeight"
-    field "thumbWidth"
+    field "thumbHeight", type: :integer
+    field "thumbWidth", type: :integer
     field "writers"
   end
 

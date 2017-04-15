@@ -12,25 +12,46 @@ defmodule TheTVDB.Model do
       Module.register_attribute(__MODULE__, :model_fields, accumulate: true, persist: false)
       unquote(block)
 
-      defstruct (Module.get_attribute(__MODULE__, :model_fields) |> Enum.map(&elem(&1, 0)))
+      defstruct Module.get_attribute(__MODULE__, :model_fields) |> Enum.map(&Keyword.get(&1, :name))
       
       @type t :: %__MODULE__{}
 
       @doc false
       def from_json(data) when is_map(data) do
-        @model_fields
-        |> Enum.reduce(%__MODULE__{}, fn {name, api_name}, acc ->
+        Enum.reduce(@model_fields, %__MODULE__{}, fn metadata, acc ->
+          name     = Keyword.get(metadata, :name)
+          api_name = Keyword.get(metadata, :api_name)
+
           val = Map.get(data, api_name)
+          val = case Keyword.get(metadata, :type) do
+            :unix_timestamp ->
+              TheTVDB.API.Utils.parse_unix_timestamp(val)
+            :datetime ->
+              TheTVDB.API.Utils.parse_datetime(val)
+            :time ->
+              TheTVDB.API.Utils.parse_time(val)
+            :date ->
+              TheTVDB.API.Utils.parse_date(val)
+            :integer ->
+              TheTVDB.API.Utils.parse_integer(val)
+            nil ->
+              val
+          end
+
           Map.put(acc, name, val)
         end)
       end
     end
   end
 
-  defmacro field(api_name) do
+  defmacro field(api_name, options \\ []) do
     name = api_name_to_snake_case(api_name)
     quote do
-      metadata = {unquote(name), unquote(api_name)}
+      metadata =
+        unquote(options)
+        |> Keyword.put(:name, unquote(name))
+        |> Keyword.put(:api_name, unquote(api_name))
+
       Module.put_attribute(__MODULE__, :model_fields, metadata)
     end
   end

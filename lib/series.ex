@@ -3,19 +3,19 @@ defmodule TheTVDB.Series do
 
   model do
     field "airsDayOfWeek"
-    field "airsTime"
+    field "airsTime", type: :time
     field "aliases"
     field "banner"
-    field "firstAired"
+    field "firstAired", type: :date
     field "genre"
     field "id"
     field "imdbId"
-    field "lastUpdated"
+    field "lastUpdated", type: :unix_timestamp
     field "network"
     field "networkId"
     field "overview"
     field "rating"
-    field "runtime"
+    field "runtime", type: :integer
     field "seriesId"
     field "seriesName"
     field "siteRating"
@@ -30,9 +30,9 @@ defmodule TheTVDB.Series do
     model do
      field "id"
      field "image"
-     field "imageAdded"
+     field "imageAdded", type: :datetime
      field "imageAuthor"
-     field "lastUpdated"
+     field "lastUpdated", type: :datetime
      field "name"
      field "role"
      field "seriesId"
@@ -50,9 +50,9 @@ defmodule TheTVDB.Series do
       field "dvdEpisodeNumber"
       field "dvdSeason"
       field "episodeName"
-      field "firstAired"
+      field "firstAired", type: :date
       field "id"
-      field "lastUpdated"
+      field "lastUpdated", type: :unix_timestamp
       field "overview"
     end
   end
