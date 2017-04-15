@@ -72,6 +72,7 @@ defmodule TheTVDB.Series do
     end
   end
 
+  @doc "Determine if a given series exists."
   @spec exists?(integer) :: boolean
   def exists?(id) do
     case TheTVDB.API.head("/series/#{id}") do
@@ -82,6 +83,9 @@ defmodule TheTVDB.Series do
     end
   end
 
+  @doc """
+  Get info about a series.
+  """
   @spec info(integer) :: t
   def info(id) do
     case TheTVDB.API.get("/series/#{id}") do
@@ -92,6 +96,9 @@ defmodule TheTVDB.Series do
     end
   end
 
+  @doc """
+  Get all actors for a given series.
+  """
   @spec actors(integer) :: [Actor.t]
   def actors(series_id) do
     case TheTVDB.API.get("/series/#{series_id}/actors") do
@@ -102,23 +109,43 @@ defmodule TheTVDB.Series do
     end
   end
 
-  @spec episodes(integer) :: [BasicEpisode.t]
+  @doc """
+  Get all episodes for a given series.
+  
+  An `Enumerable` of `TheTVDB.Series.BasicEpisode` is returned.
+  """
+  @spec episodes(integer) :: Enumerable.t
   def episodes(series_id) do
     TheTVDB.API.get_stream("/series/#{series_id}/episodes")
     |> Stream.map(&BasicEpisode.from_json/1)
   end
 
-  @spec search_by_name(String.t) :: [t]
+  @doc """
+  Search for a series by name.
+  
+  An `Enumerable` of `TheTVDB.Series.SeriesSearch` is returned.
+  """
+  @spec search_by_name(String.t) :: Enumerable.t
   def search_by_name(name) do
     search_by("name", name)
   end
 
-  @spec search_by_imdb_id(binary | integer) :: [t]
+  @doc """
+  Search for a series by name.
+  
+  An `Enumerable` of `TheTVDB.Series.SeriesSearch` is returned.
+  """
+  @spec search_by_imdb_id(binary | integer) :: Enumerable.t
   def search_by_imdb_id(id) do
     search_by("imdbId", id)
   end
 
-  @spec search_by_zap2it_id(binary | integer) :: [t]
+  @doc """
+  Search for a series by name.
+  
+  An `Enumerable` of `TheTVDB.Series.SeriesSearch` is returned.
+  """
+  @spec search_by_zap2it_id(binary | integer) :: Enumerable.t
   def search_by_zap2it_id(id) do
     search_by("zap2itId", id)
   end
