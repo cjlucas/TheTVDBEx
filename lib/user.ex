@@ -40,7 +40,7 @@ defmodule TheTVDB.User do
       {:ok, %{"data" => data}} ->
         from_json(data)
       {:error, reason} ->
-          raise reason
+        raise reason
     end
   end
 
@@ -53,7 +53,7 @@ defmodule TheTVDB.User do
       {:ok, %{"data" => data}} ->
         data["favorites"]
       {:error, reason} ->
-          raise reason
+        raise reason
     end
   end
 
@@ -99,7 +99,7 @@ defmodule TheTVDB.User do
       # Rate an episode
       TheTVDB.User.add_rating(:episode, episode_id, 10.0)
       # => :ok
-      
+
       # Rate an image
       TheTVDB.User.add_rating(:image, image_id, 10.0)
       # => :ok

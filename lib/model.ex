@@ -13,7 +13,7 @@ defmodule TheTVDB.Model do
       unquote(block)
 
       defstruct Module.get_attribute(__MODULE__, :model_fields) |> Enum.map(&Keyword.get(&1, :name))
-      
+
       @type t :: %__MODULE__{}
 
       @doc false

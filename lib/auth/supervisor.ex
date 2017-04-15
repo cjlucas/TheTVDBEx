@@ -15,7 +15,7 @@ defmodule TheTVDB.Auth.Supervisor do
     child = worker(TheTVDB.Auth.Server, [api_key], id: :global, restart: :transient)
     Supervisor.start_child(__MODULE__, child)
   end
-  
+
   def start_child(api_key, username, user_key) do
     if Registry.lookup(TheTVDB.Auth.Registry, :global) |> Enum.empty? do
       {:ok, _} = start_child(api_key)

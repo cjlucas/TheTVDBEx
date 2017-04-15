@@ -6,9 +6,9 @@ defmodule TheTVDB do
 
 
   ## Authentication
-  
+
   This module supports multiple ways to authenticate with TheTVDB API.
-  
+
   If only interested in globally-scoped endpoints (such as fetching
   series/episode information), Authenticating via `TheTVDB.authenticate/1`
   is all that's required.
@@ -16,7 +16,7 @@ defmodule TheTVDB do
   Token refreshes are handled automatically by the library.
 
   ### User Authentication
-  
+
   This module supports multi-user authentication. All functions in `TheTVDB.User`
   support an optional username. If the username is omitted, the last
   authenticated user will be used.
@@ -26,18 +26,18 @@ defmodule TheTVDB do
 
       TheTVDB.authenticate(api_key, "johnDoe", acct_id)
       # => :ok
-  
+
       # Fetch user authentication for johnDoe
       TheTVDB.User.info()
 
       TheTVDB.authenticate(api_key, "jamesDean", acct_id)
-      
+
       # Fetch user authentication for jamesDean
       TheTVDB.User.info("jamesDean")
 
 
   ## Error Handling
-  
+
   With the exception of `TheTVDB.authenticate/1` and `TheTVDB.authenticate/3`,
   all functions will raise an error.
   """
@@ -68,7 +68,7 @@ defmodule TheTVDB do
     TheTVDB.Auth.Supervisor.start_child(api_key)
     |> handle_sup_response
   end
-  
+
   @doc """
   Authenticate with TheTVDB API. This will provide access to both globally
   and user scoped endpoints.
@@ -87,6 +87,6 @@ defmodule TheTVDB do
       {:ok, _}                        -> :ok
       {:error, {:already_started, _}} -> :ok
       {:error, {reason, _}}           -> {:error, reason}
-    end 
+    end
   end
 end

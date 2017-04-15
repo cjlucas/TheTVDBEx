@@ -1,6 +1,6 @@
 defmodule TheTVDB.Auth.Server do
   use GenServer
-  
+
   @moduledoc false
 
   @refresh_interval 60 * 60 * 1000
@@ -14,7 +14,7 @@ defmodule TheTVDB.Auth.Server do
   def start_link(api_key) do
     GenServer.start_link(__MODULE__, {:global, api_key})
   end
-  
+
   def start_link(api_key, username, user_key) do
     GenServer.start_link(__MODULE__, {:user, api_key, username, user_key})
   end
@@ -34,7 +34,7 @@ defmodule TheTVDB.Auth.Server do
   def init({:user, api_key, username, user_key}) do
     TheTVDB.Auth.Registry.register(:user)
     TheTVDB.Auth.Registry.register({:user, username})
-    
+
     case TheTVDB.Auth.login(api_key, username, user_key) do
       {:ok, token} ->
         expires_at = now() + @refresh_interval
@@ -64,7 +64,7 @@ defmodule TheTVDB.Auth.Server do
 
   def handle_call(:token, _from, state) do
     %{token: token, expires_at: expires_at} = state
-    {:reply, token, state, timeout(expires_at)} 
+    {:reply, token, state, timeout(expires_at)}
   end
 
   def handle_info(:timeout, state) do

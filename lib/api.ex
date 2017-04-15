@@ -81,7 +81,7 @@ defmodule TheTVDB.API do
         {:error, reason}
     end
   end
-  
+
   def delete(endpoint, opts \\ []) do
     case request(:delete, url(endpoint), opts) do
       {:ok, _, _} ->

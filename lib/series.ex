@@ -116,7 +116,7 @@ defmodule TheTVDB.Series do
 
   @doc """
   Get all episodes for a given series.
-  
+
   An `Enumerable` of `TheTVDB.Series.BasicEpisode` is returned.
   """
   @spec episodes(integer) :: Enumerable.t
@@ -127,7 +127,7 @@ defmodule TheTVDB.Series do
 
   @doc """
   Search for a series by name.
-  
+
   An `Enumerable` of `TheTVDB.Series.SeriesSearch` is returned.
   """
   @spec search_by_name(String.t) :: Enumerable.t
@@ -137,7 +137,7 @@ defmodule TheTVDB.Series do
 
   @doc """
   Search for a series by name.
-  
+
   An `Enumerable` of `TheTVDB.Series.SeriesSearch` is returned.
   """
   @spec search_by_imdb_id(binary | integer) :: Enumerable.t
@@ -147,7 +147,7 @@ defmodule TheTVDB.Series do
 
   @doc """
   Search for a series by name.
-  
+
   An `Enumerable` of `TheTVDB.Series.SeriesSearch` is returned.
   """
   @spec search_by_zap2it_id(binary | integer) :: Enumerable.t

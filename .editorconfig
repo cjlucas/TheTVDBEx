@@ -1,0 +1,5 @@
+[*]
+trim_trailing_whitespace = true
+
+[*.{ex,exs}]
+indent_size = 2
