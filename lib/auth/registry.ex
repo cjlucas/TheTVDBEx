@@ -10,9 +10,11 @@ defmodule TheTVDB.Auth.Registry do
 
   @spec register(scope) :: :ok
   def register(scope) do
-    :ok = Registry.unregister(__MODULE__, scope)
-    {:ok, _} = Registry.register(__MODULE__, scope, [])
-    :ok
+    case Registry.register(__MODULE__, scope, []) do
+      {:ok, _}                           -> :ok
+      {:error, {:already_registered, _}} -> :ok
+      {:error, reason}                   -> {:error, reason}
+    end
   end
 
   @spec lookup(scope) :: {:ok, binary} | {:error, :no_server_found}

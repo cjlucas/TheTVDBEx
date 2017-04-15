@@ -13,6 +13,8 @@ defmodule TheTVDB.Auth do
     case TheTVDB.API.post("/login", body, requires_auth: false) do
       {:ok, %{"token" => token}} ->
         {:ok, token}
+      {:ok, %{"Error" => _}} ->
+        {:error, :unauthorized}
       {:error, reason} ->
         {:error, reason}
     end

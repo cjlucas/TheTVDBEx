@@ -20,13 +20,21 @@ defmodule TheTVDB do
 
   @spec authenticate(binary) :: :ok | {:error, String.t}
   def authenticate(api_key) do
-    {:ok, _} = TheTVDB.Auth.Supervisor.start_child(api_key)
-    :ok
+    TheTVDB.Auth.Supervisor.start_child(api_key)
+    |> handle_sup_response
   end
   
   @spec authenticate(binary, String.t, binary) :: :ok | {:error, String.t}
   def authenticate(api_key, username, user_key) do
-    {:ok, _} = TheTVDB.Auth.Supervisor.start_child(api_key, username, user_key)
-    :ok
+    TheTVDB.Auth.Supervisor.start_child(api_key, username, user_key)
+    |> handle_sup_response
+  end
+
+  defp handle_sup_response(resp) do
+    case resp do
+      {:ok, _}                        -> :ok
+      {:error, {:already_started, _}} -> :ok
+      {:error, {reason, _}}           -> {:error, reason}
+    end 
   end
 end
