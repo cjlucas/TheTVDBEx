@@ -63,7 +63,7 @@ defmodule TheTVDB.Series do
     model do
       field "aliases"
       field "banner"
-      field "firstAired"
+      field "firstAired", type: :date
       field "id"
       field "network"
       field "overview"
