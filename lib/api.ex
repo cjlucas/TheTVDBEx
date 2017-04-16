@@ -111,7 +111,7 @@ defmodule TheTVDB.API do
           pid when is_pid(pid) ->
             TheTVDB.Auth.Server.token(pid)
           nil ->
-            raise TheTVDB.NotAuthenticatedError, "No token found"
+            raise TheTVDB.NotAuthenticatedError, "No token found (scope: #{inspect opts[:scope]})"
         end
       end)
     else
