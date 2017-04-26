@@ -39,4 +39,8 @@ defmodule TheTVDB.API.Utils do
   def parse_unix_timestamp(time) when is_binary(time) do
     String.to_integer(time) |> parse_unix_timestamp
   end
+
+  def unwrap_or_raise(:ok), do: :ok
+  def unwrap_or_raise({:ok, data}), do: data
+  def unwrap_or_raise({:error, reason}), do: raise reason
 end
