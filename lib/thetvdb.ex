@@ -42,6 +42,8 @@ defmodule TheTVDB do
   all functions will raise an error.
   """
 
+  import TheTVDB.API.Utils, only: [unwrap_or_raise: 1]
+
   @doc false
   def start(_, _) do
     import Supervisor.Spec, warn: false
@@ -70,6 +72,12 @@ defmodule TheTVDB do
   end
 
   @doc """
+  See `authenticate/1`.
+  """
+  @spec authenticate!(binary) :: :ok
+  def authenticate!(api_key), do: authenticate(api_key) |> unwrap_or_raise
+
+  @doc """
   Authenticate with TheTVDB API. This will provide access to both globally
   and user scoped endpoints.
 
@@ -80,6 +88,14 @@ defmodule TheTVDB do
   def authenticate(api_key, username, user_key) do
     TheTVDB.Auth.Supervisor.start_child(api_key, username, user_key)
     |> handle_sup_response
+  end
+
+  @doc """
+  See `authenticate/3`.
+  """
+  @spec authenticate!(binary, String.t, binary) :: :ok
+  def authenticate!(api_key, username, user_key) do
+    authenticate(api_key, username, user_key) |> unwrap_or_raise
   end
 
   defp handle_sup_response(resp) do
