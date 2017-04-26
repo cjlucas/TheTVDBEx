@@ -102,8 +102,8 @@ defmodule TheTVDB.API do
   end
 
   defp opts(opts) do
-    opts = Keyword.put_new(opts, :requires_auth, true)
-    opts = Keyword.put_new(opts, :scope, :global)
+    defaults = [requires_auth: true, scope: :global, retries: 5]
+    opts = Keyword.merge(defaults, opts)
 
     if opts[:requires_auth] do
       Keyword.put_new_lazy(opts, :token, fn ->
@@ -135,6 +135,14 @@ defmodule TheTVDB.API do
         {:ok, code, Poison.decode!(body)}
       {:ok, %{status_code: code}} ->
         {:ok, code, nil}
+      {:error, %HTTPoison.Error{} = reason} ->
+        opts = Keyword.update(opts, :retries, 0, &(&1 - 1))
+        if opts[:retries] == 0 do
+          {:error, reason}
+        else
+          Process.sleep((5 - opts[:retries]) * 1000)
+          request(method, url, body, opts)
+        end
       {:error, reason} ->
         {:error, reason}
     end
