@@ -34,12 +34,6 @@ defmodule TheTVDB do
 
       # Fetch user authentication for jamesDean
       TheTVDB.User.info("jamesDean")
-
-
-  ## Error Handling
-
-  With the exception of `TheTVDB.authenticate/1` and `TheTVDB.authenticate/3`,
-  all functions will raise an error.
   """
 
   import TheTVDB.API.Utils, only: [unwrap_or_raise: 1]
