@@ -17,12 +17,14 @@ defmodule TheTVDB.API.Utils do
   end
 
   def parse_date(""), do: nil
+  def parse_date("0000-00-00"), do: nil
   def parse_date(date) when is_nil(date), do: nil
   def parse_date(date) do
     Timex.parse!(date, "%Y-%m-%d", :strftime) |> NaiveDateTime.to_date
   end
 
   def parse_datetime(""), do: nil
+  def parse_datetime("0000-00-00 00:00:00"), do: nil
   def parse_datetime(date) when is_nil(date), do: nil
   def parse_datetime(date) do
     Timex.parse!(date, "%Y-%m-%d %H:%M:%S", :strftime)
