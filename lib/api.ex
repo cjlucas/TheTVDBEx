@@ -141,10 +141,10 @@ defmodule TheTVDB.API do
         {:ok, code, Poison.decode!(body)}
       {:ok, %{status_code: code}} ->
         {:ok, code, nil}
-      {:error, %HTTPoison.Error{} = reason} ->
+      {:error, %HTTPoison.Error{reason: reason}} ->
         opts = Keyword.update(opts, :num_attempts, 1, &(&1 + 1))
         if opts[:num_attempts] == @max_attempts do
-          {:error, reason}
+          {:error, %TheTVDB.ServerError{reason: reason}}
         else
           delay = (2 <<< (opts[:num_attempts] - 1)) * @backoff_multiplier
           Process.sleep(delay)

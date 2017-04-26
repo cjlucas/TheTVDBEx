@@ -1,15 +1,13 @@
 defmodule TheTVDB.NotAuthenticatedError do
   defexception [:message]
-
-  def exception(message) do
-    %__MODULE__{message: message}
-  end
 end
 
 defmodule TheTVDB.NotFoundError do
   defexception [:message]
+end
 
-  def exception(message) do
-    %__MODULE__{message: message}
-  end
+defmodule TheTVDB.ServerError do
+  defexception reason: nil
+
+  def message(%__MODULE__{reason: reason}), do: inspect(reason)
 end
