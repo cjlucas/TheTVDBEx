@@ -135,10 +135,10 @@ defmodule TheTVDB.API do
       {:ok, %{status_code: 401}} ->
         {:error, %TheTVDB.NotAuthenticatedError{message: "Not authenticated"}}
       {:ok, %{status_code: 404, body: body}} ->
-        msg = Poison.decode!(body) |> Map.get("Error")
+        msg = decode!(body) |> Map.get("Error")
         {:error, %TheTVDB.NotFoundError{message: msg}}
       {:ok, %{status_code: code, body: body}} when byte_size(body) > 0 ->
-        {:ok, code, Poison.decode!(body)}
+        {:ok, code, decode!(body)}
       {:ok, %{status_code: code}} ->
         {:ok, code, nil}
       {:error, %HTTPoison.Error{reason: reason}} ->
@@ -154,6 +154,9 @@ defmodule TheTVDB.API do
         {:error, reason}
     end
   end
+
+  defp decode!(""), do: %{}
+  defp decode!(body), do: Poison.decode!(body)
 
   defp url(endpoint) do
     @base_url <> endpoint

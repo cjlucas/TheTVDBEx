@@ -74,12 +74,16 @@ defmodule TheTVDB.Series do
     end
   end
 
-  @doc "Determine if a given series exists."
+  @doc """
+  Determine if a given series exists.
+  """
   @spec exists?(integer) :: {:ok, boolean} | {:error, term}
   def exists?(id) do
     case TheTVDB.API.head("/series/#{id}") do
-      {:ok, code} ->
-        {:ok, code == 200}
+      {:ok, _} ->
+        {:ok, true}
+      {:error, %TheTVDB.NotFoundError{}} ->
+        {:ok, false}
       {:error, reason} ->
         {:error, reason}
     end
