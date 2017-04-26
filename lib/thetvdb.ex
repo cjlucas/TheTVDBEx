@@ -29,11 +29,14 @@ defmodule TheTVDB do
 
       # Fetch user authentication for johnDoe
       TheTVDB.User.info()
+      # => {:ok, %TheTVDB.User{username: "johnDoe", ...}}
 
       TheTVDB.authenticate(api_key, "jamesDean", acct_id)
+      # => :ok
 
       # Fetch user authentication for jamesDean
       TheTVDB.User.info("jamesDean")
+      # => {:ok, %TheTVDB.User{username: "jamesDean", ...}}
   """
 
   import TheTVDB.API.Utils, only: [unwrap_or_raise: 1]
