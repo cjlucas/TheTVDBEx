@@ -106,8 +106,8 @@ defmodule TheTVDB.API do
   end
 
   defp opts(opts) do
-    defaults = [requires_auth: true, scope: :global]
-    opts = Keyword.merge(defaults, opts)
+    opts = Keyword.put_new(opts, :requires_auth, true)
+    opts = Keyword.put_new(opts, :scope, :global)
 
     if opts[:requires_auth] do
       Keyword.put_new_lazy(opts, :token, fn ->
