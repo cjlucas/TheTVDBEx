@@ -174,7 +174,7 @@ defmodule TheTVDB.Series do
   def search_by_name!(name), do: search_by_name(name) |> unwrap_or_raise
 
   @doc """
-  Search for a series by name.
+  Search for a series by IMDb ID.
 
   An `Enumerable` of `TheTVDB.Series.SearchResult` is returned.
   """
@@ -190,7 +190,7 @@ defmodule TheTVDB.Series do
   def search_by_imdb_id!(id), do: search_by_imdb_id(id) |> unwrap_or_raise
 
   @doc """
-  Search for a series by name.
+  Search for a series by Zap2It ID.
 
   An `Enumerable` of `TheTVDB.Series.SearchResult` is returned.
   """
