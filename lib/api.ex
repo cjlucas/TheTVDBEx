@@ -4,6 +4,10 @@ defmodule TheTVDB.API do
 
   @base_url Application.get_env(:thetvdb, :api_url, "https://api.thetvdb.com")
 
+  @max_attempts Application.get_env(:thetvdb, :max_attempts, 5)
+
+  @backoff_multiplier Application.get_env(:thetvdb, :backoff_multiplier, 300)
+
   def get(endpoint, opts \\ []) do
     case request(:get, url(endpoint), opts) do
       {:ok, _, body} ->
@@ -120,6 +124,8 @@ defmodule TheTVDB.API do
   end
 
   def request(method, url, body \\ "", opts) do
+    use Bitwise
+
     opts = opts(opts)
     headers = headers(opts)
 
@@ -135,6 +141,15 @@ defmodule TheTVDB.API do
         {:ok, code, Poison.decode!(body)}
       {:ok, %{status_code: code}} ->
         {:ok, code, nil}
+      {:error, %HTTPoison.Error{} = reason} ->
+        opts = Keyword.update(opts, :num_attempts, 1, &(&1 + 1))
+        if opts[:num_attempts] == @max_attempts do
+          {:error, reason}
+        else
+          delay = (2 <<< (opts[:num_attempts] - 1)) * @backoff_multiplier
+          Process.sleep(delay)
+          request(method, url, body, opts)
+        end
       {:error, reason} ->
         {:error, reason}
     end

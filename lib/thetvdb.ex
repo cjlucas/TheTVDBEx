@@ -37,6 +37,28 @@ defmodule TheTVDB do
       # Fetch user authentication for jamesDean
       TheTVDB.User.info("jamesDean")
       # => {:ok, %TheTVDB.User{user_name: "jamesDean", ...}}
+
+
+  ## Automatic retries
+
+  In the event of a service outage, requests will be retried using an
+  exponential backoff strategy. The formula for the delay (in milliseconds)
+  between requests is as follows:
+
+      (2 ** num_attempts) * backoff_multiplier
+
+  ## Configuration
+
+  The parameters below are able to be configured by the user:
+  - max_attempts - The maximum number of attempts for a single request (default: 5)
+  - backoff_multiplier - See "Automatic retries" section above (default: 300)
+
+  To modify the default configuration, add the following to your config:
+
+      config :thetvdb,
+        max_attempts: 10,
+        backoff_multiplier: 500
+
   """
 
   import TheTVDB.API.Utils, only: [unwrap_or_raise: 1]
