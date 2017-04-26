@@ -59,7 +59,7 @@ defmodule TheTVDB.Series do
     end
   end
 
-  defmodule SeriesSearch do
+  defmodule SearchResult do
     use TheTVDB.Model
 
     model do
@@ -160,7 +160,7 @@ defmodule TheTVDB.Series do
   @doc """
   Search for a series by name.
 
-  An `Enumerable` of `TheTVDB.Series.SeriesSearch` is returned.
+  An `Enumerable` of `TheTVDB.Series.SearchResult` is returned.
   """
   @spec search_by_name(String.t) :: {:ok, Enumerable.t} | {:error, term}
   def search_by_name(name) do
@@ -176,7 +176,7 @@ defmodule TheTVDB.Series do
   @doc """
   Search for a series by name.
 
-  An `Enumerable` of `TheTVDB.Series.SeriesSearch` is returned.
+  An `Enumerable` of `TheTVDB.Series.SearchResult` is returned.
   """
   @spec search_by_imdb_id(binary | integer) :: {:ok, Enumerable.t} | {:error, term}
   def search_by_imdb_id(id) do
@@ -192,7 +192,7 @@ defmodule TheTVDB.Series do
   @doc """
   Search for a series by name.
 
-  An `Enumerable` of `TheTVDB.Series.SeriesSearch` is returned.
+  An `Enumerable` of `TheTVDB.Series.SearchResult` is returned.
   """
   @spec search_by_zap2it_id(binary | integer) :: {:ok, Enumerable.t} | {:error, term}
   def search_by_zap2it_id(id) do
@@ -210,7 +210,7 @@ defmodule TheTVDB.Series do
     IO.puts endpoint
     case TheTVDB.API.get(endpoint) do
       {:ok, %{"data" => data}} ->
-        {:ok, data |> Enum.map(&SeriesSearch.from_json(&1))}
+        {:ok, data |> Enum.map(&SearchResult.from_json(&1))}
       # API WORKAROUND: A 404 is returned if no results are found.
       # But it's more natural to return an empty list indicating no results.
       {:error, %TheTVDB.NotFoundError{}} ->
