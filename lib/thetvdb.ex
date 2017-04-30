@@ -104,6 +104,9 @@ defmodule TheTVDB do
   user account page.
   """
   @spec authenticate(binary, String.t, binary) :: :ok | {:error, TheTVDB.NotAuthenticatedError.t}
+  def authenticate(api_key, username, user_key) when byte_size(username) == 0 do
+    {:error, %TheTVDB.NotAuthenticatedError{message: "No user specified"}}
+  end
   def authenticate(api_key, username, user_key) do
     TheTVDB.Auth.Supervisor.start_child(api_key, username, user_key)
     |> handle_sup_response
