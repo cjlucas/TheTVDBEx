@@ -6,15 +6,13 @@ Documentation can be found [here](https://hexdocs.pm/thetvdb/TheTVDB.html).
 
 ## Installation
 
+Add the following to your `mix.exs`:
+
 ```elixir
 def deps do
   [{:thetvdb, "~> 1.0.0"}]
 end
-```
 
-This library runs as an application, so ensure it's added to `mix.exs`:
-
-```elixir
 def applications do
   [applications: [:thetvdb]]
 end
