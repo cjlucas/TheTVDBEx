@@ -140,10 +140,8 @@ defmodule TheTVDB.Series do
 
   @doc """
   Get all episodes for a given series.
-
-  An `Enumerable` of `TheTVDB.Series.BasicEpisode` is returned.
   """
-  @spec episodes(integer) :: {:ok, Enumerable.t} | {:error, term}
+  @spec episodes(integer) :: {:ok, [BasicEpisode.t]} | {:error, term}
   def episodes(series_id) do
     case TheTVDB.API.get_iter("/series/#{series_id}/episodes") do
       {:ok, data} ->
@@ -156,7 +154,7 @@ defmodule TheTVDB.Series do
   @doc """
   See `episodes/1`.
   """
-  @spec episodes!(integer) :: Enumerable.t
+  @spec episodes!(integer) :: [BasicEpisode.t]
   def episodes!(series_id), do: episodes(series_id) |> unwrap_or_raise
 
   @doc """
