@@ -145,10 +145,12 @@ defmodule TheTVDB.Series do
   """
   @spec episodes(integer) :: {:ok, Enumerable.t} | {:error, term}
   def episodes(series_id) do
-    stream = TheTVDB.API.get_stream("/series/#{series_id}/episodes")
-             |> Stream.map(&BasicEpisode.from_json/1)
-
-    {:ok, stream}
+    case TheTVDB.API.get_iter("/series/#{series_id}/episodes") do
+      {:ok, data} ->
+        {:ok, Enum.map(data, &BasicEpisode.from_json/1)}
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 
   @doc """
