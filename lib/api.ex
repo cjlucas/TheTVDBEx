@@ -79,9 +79,11 @@ defmodule TheTVDB.API do
   end
 
   defp opts(opts) do
-    opts = Keyword.put_new(opts, :requires_auth, true)
-    opts = Keyword.put_new(opts, :scope, :global)
-    opts = Keyword.put_new(opts, :page, 0)
+    opts =
+      opts
+      |> Keyword.put_new(:requires_auth, true)
+      |> Keyword.put_new(:scope, :global)
+      |> Keyword.put_new(:page, 0)
 
     if opts[:requires_auth] do
       Keyword.put_new_lazy(opts, :token, fn ->
