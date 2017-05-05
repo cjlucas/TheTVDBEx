@@ -159,10 +159,8 @@ defmodule TheTVDB.Series do
 
   @doc """
   Search for a series by name.
-
-  An `Enumerable` of `TheTVDB.Series.SearchResult` is returned.
   """
-  @spec search_by_name(String.t) :: {:ok, Enumerable.t} | {:error, term}
+  @spec search_by_name(String.t) :: {:ok, [SearchResult.t]} | {:error, term}
   def search_by_name(name) do
     search_by("name", name)
   end
@@ -170,15 +168,13 @@ defmodule TheTVDB.Series do
   @doc """
   See `search_by_name/1`.
   """
-  @spec search_by_name!(String.t) :: Enumerable.t
+  @spec search_by_name!(String.t) :: SearchResult.t
   def search_by_name!(name), do: search_by_name(name) |> unwrap_or_raise
 
   @doc """
   Search for a series by IMDb ID.
-
-  An `Enumerable` of `TheTVDB.Series.SearchResult` is returned.
   """
-  @spec search_by_imdb_id(binary | integer) :: {:ok, Enumerable.t} | {:error, term}
+  @spec search_by_imdb_id(binary | integer) :: {:ok, SearchResult.t} | {:error, term}
   def search_by_imdb_id(id) do
     search_by("imdbId", id)
   end
@@ -186,15 +182,13 @@ defmodule TheTVDB.Series do
   @doc """
   See `search_by_imdb_id/1`.
   """
-  @spec search_by_imdb_id!(binary | integer) :: Enumerable.t
+  @spec search_by_imdb_id!(binary | integer) :: SearchResult.t
   def search_by_imdb_id!(id), do: search_by_imdb_id(id) |> unwrap_or_raise
 
   @doc """
   Search for a series by Zap2It ID.
-
-  An `Enumerable` of `TheTVDB.Series.SearchResult` is returned.
   """
-  @spec search_by_zap2it_id(binary | integer) :: {:ok, Enumerable.t} | {:error, term}
+  @spec search_by_zap2it_id(binary | integer) :: {:ok, SearchResult.t} | {:error, term}
   def search_by_zap2it_id(id) do
     search_by("zap2itId", id)
   end
@@ -202,7 +196,7 @@ defmodule TheTVDB.Series do
   @doc """
   See `search_by_zap2it_id/1`.
   """
-  @spec search_by_zap2it_id!(binary | integer) :: Enumerable.t
+  @spec search_by_zap2it_id!(binary | integer) :: SearchResult.t
   def search_by_zap2it_id!(id), do: search_by_zap2it_id(id) |> unwrap_or_raise
 
   defp search_by(param, query) do
