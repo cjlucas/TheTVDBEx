@@ -115,10 +115,12 @@ defmodule TheTVDB.User do
   """
   @spec ratings(username) :: {:ok, [Rating.t]}
   def ratings(username \\ nil) do
-    stream = TheTVDB.API.get_stream("/user/ratings", scope: scope(username))
-             |> Stream.map(&Rating.from_json/1)
-
-    {:ok, stream}
+    case TheTVDB.API.get_iter("/user/ratings", scope: scope(username)) do
+      {:ok, data} ->
+        {:ok, Enum.map(data, &Rating.from_json/1)}
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 
   @doc """

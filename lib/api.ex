@@ -17,6 +17,21 @@ defmodule TheTVDB.API do
     end
   end
 
+  def get_iter(endpoint, opts \\ []) do
+    get_iter(endpoint, [], opts)
+  end
+  defp get_iter(endpoint, acc, opts) do
+    case get(endpoint, opts) do
+      {:ok, %{"data" => data, "links" => %{"next" => nil}}} ->
+        {:ok, Enum.reverse([data | acc]) |> List.flatten}
+      {:ok, %{"data" => data, "links" => %{"next" => page}}} ->
+        opts = Keyword.put(opts, :page, page)
+        get_iter(endpoint, [data | acc], opts)
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
   def head(endpoint, opts \\[]) do
     case request(:head, url(endpoint), opts) do
       {:ok, status_code, _} ->
@@ -24,48 +39,6 @@ defmodule TheTVDB.API do
       {:error, reason} ->
         {:error, reason}
     end
-  end
-
-  def get_stream(endpoint, opts \\ []) do
-    start = fn ->
-      case request(:get, url(endpoint), opts) do
-        {:ok, _, body} ->
-          %{"data" => data, "links" => links} = body
-          %{"next" => next} = links
-          {data, next}
-        {:error, reason} ->
-          raise reason
-      end
-    end
-
-    next = fn
-      {[], nil} = acc ->
-        {:halt, acc}
-      {data, nil} ->
-        {data, {[], nil}}
-      {data, page} ->
-        query =
-          URI.parse(endpoint).query || %{}
-          |> Map.put("page", page)
-          |> URI.encode_query
-
-        url =
-          url(endpoint)
-          |> URI.parse
-          |> Map.put(:query, query)
-          |> URI.to_string
-
-        case request(:get, url, opts) do
-          {:ok, _, body} ->
-            %{"data" => next_data, "links" => links} = body
-            %{"next" => next} = links
-            {data, {next_data, next}}
-          {:error, reason} ->
-            raise reason
-        end
-    end
-
-    Stream.resource(start, next, fn _ -> nil end)
   end
 
   def put(endpoint, body \\ "", opts \\ []) do
@@ -108,6 +81,7 @@ defmodule TheTVDB.API do
   defp opts(opts) do
     opts = Keyword.put_new(opts, :requires_auth, true)
     opts = Keyword.put_new(opts, :scope, :global)
+    opts = Keyword.put_new(opts, :page, 0)
 
     if opts[:requires_auth] do
       Keyword.put_new_lazy(opts, :token, fn ->
@@ -130,6 +104,21 @@ defmodule TheTVDB.API do
 
     opts = opts(opts)
     headers = headers(opts)
+
+    url =
+      if opts[:page] > 0 do
+        query =
+          URI.parse(url).query || %{}
+          |> Map.put("page", opts[:page])
+          |> URI.encode_query
+
+        url
+        |> URI.parse
+        |> Map.put(:query, query)
+        |> URI.to_string
+      else
+        url
+      end
 
     body = if is_binary(body), do: body, else: Poison.encode!(body)
 
