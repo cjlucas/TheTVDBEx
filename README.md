@@ -10,7 +10,7 @@ Add the following to your `mix.exs`:
 
 ```elixir
 def deps do
-  [{:thetvdb, "~> 1.0.0"}]
+  [{:thetvdb, "~> 1.1.0"}]
 end
 
 def applications do
