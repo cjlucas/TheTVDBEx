@@ -44,12 +44,12 @@ defmodule TheTVDB.Auth.Server do
     end
   end
 
-  @spec refresh(pid) :: :ok
+  @spec refresh(pid) :: :ok | {:error, String.t}
   def refresh(pid) do
     GenServer.call(pid, :refresh)
   end
 
-  @spec refresh(pid) :: String.t
+  @spec token(pid) :: String.t
   def token(pid) do
     GenServer.call(pid, :token)
   end
@@ -57,14 +57,14 @@ defmodule TheTVDB.Auth.Server do
   def handle_call(:refresh, _from, state) do
     %{token: token} = state
 
-    token =
+    {reply, token} =
       case TheTVDB.Auth.refresh_token(token) do
-        {:ok, t} -> t
-        _        -> token
+        {:ok, t}         -> {:ok, t}
+        {:error, reason} -> {{:error, reason}, token}
       end
 
     expires_at = now() + @refresh_interval
-    {:reply, :ok, %{state | token: token, expires_at: expires_at}, @refresh_interval}
+    {:reply, reply, %{state | token: token, expires_at: expires_at}, @refresh_interval}
   end
 
   def handle_call(:token, _from, state) do
@@ -73,7 +73,7 @@ defmodule TheTVDB.Auth.Server do
   end
 
   def handle_info(:timeout, state) do
-    {:reply, :ok, state, timeout} = handle_call(:refresh, nil, state)
+    {:reply, _, state, timeout} = handle_call(:refresh, nil, state)
     {:noreply, state, timeout}
   end
 
