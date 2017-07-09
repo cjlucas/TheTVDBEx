@@ -73,7 +73,7 @@ defmodule TheTVDB.Auth.Server do
   end
 
   def handle_info(:timeout, state) do
-    {:reply, :ok, state, timeout} = handle_call(:refresh, nil, state)
+    {:reply, _, state, timeout} = handle_call(:refresh, nil, state)
     {:noreply, state, timeout}
   end
 
