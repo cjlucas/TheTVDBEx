@@ -64,7 +64,7 @@ defmodule TheTVDB.Auth.Server do
       end
 
     expires_at = now() + @refresh_interval
-    {:reply, :ok, %{state | token: token, expires_at: expires_at}, @refresh_interval}
+    {:reply, reply, %{state | token: token, expires_at: expires_at}, @refresh_interval}
   end
 
   def handle_call(:token, _from, state) do
