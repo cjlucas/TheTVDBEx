@@ -1,3 +1,9 @@
+1.2.0
+=====
+- Minimum versions supported:
+  * OTP 22
+  * Elixir 1.8
+
 1.1.1
 =====
 - `Auth.Server.refresh_token` now returns an error on failure
