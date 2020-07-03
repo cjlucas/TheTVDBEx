@@ -4,7 +4,7 @@ defmodule TheTVDB.Mixfile do
   def project do
     [app: :thetvdb,
      version: "1.1.1",
-     elixir: "~> 1.4",
+     elixir: "~> 1.8",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      description: description(),
