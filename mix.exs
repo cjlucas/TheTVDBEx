@@ -51,7 +51,7 @@ defmodule TheTVDB.Mixfile do
       {:httpoison, "~> 1.7"},
       {:poison, "~> 4.0"},
       {:timex, "~> 3.6"},
-      {:bypass, "~> 0.6", only: :test},
+      {:bypass, "~> 1.0", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
