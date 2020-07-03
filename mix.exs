@@ -48,9 +48,9 @@ defmodule TheTVDB.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:httpoison, "~> 0.11"},
-      {:poison, "~> 3.1"},
-      {:timex, "~> 3.1"},
+      {:httpoison, "~> 1.7"},
+      {:poison, "~> 4.0"},
+      {:timex, "~> 3.6"},
       {:bypass, "~> 0.6", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
